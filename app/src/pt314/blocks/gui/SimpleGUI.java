@@ -217,12 +217,20 @@ public class SimpleGUI extends JFrame implements ActionListener {
 		Direction dir = getMoveDirection(selectedBlockRow, selectedBlockCol, row, col);
 		int dist = Math.abs(vertDist + horzDist);
 		
-		if (!board.moveBlock(selectedBlockRow, selectedBlockCol, dir, dist)) {
+		boolean movedBlock = board.moveBlock(selectedBlockRow, selectedBlockCol, dir, dist);
+		
+		if (!movedBlock) {
 			System.err.println("Invalid move!");
 		}
 		else {
 			selectedBlock = null;
 			updateUI();
+		}
+		
+		Block block = board.getBlockAt(row, col);
+		
+		if(block instanceof TargetBlock && col == board.getWidth() -1){
+			JOptionPane.showMessageDialog(null, "You Win!", "InfoBox: ", JOptionPane.INFORMATION_MESSAGE);
 		}
 	}
 
