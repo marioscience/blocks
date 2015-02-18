@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -43,7 +44,7 @@ public class SimpleGUI extends JFrame implements ActionListener {
 	private JMenuItem exitMenuItem;
 	private JMenuItem aboutMenuItem;
 	
-	public SimpleGUI() {
+	public SimpleGUI() throws FileNotFoundException {
 		super("Blocks");
 		
 		initMenus();
@@ -68,7 +69,12 @@ public class SimpleGUI extends JFrame implements ActionListener {
 		newGameMenuItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(SimpleGUI.this, "Coming soon...");
+				try {
+					initBoard();
+				} catch (FileNotFoundException e1) {
+					System.out.println("File Not Found");
+					e1.printStackTrace();
+				}
 			}
 		});
 		gameMenu.add(newGameMenuItem);
@@ -96,13 +102,19 @@ public class SimpleGUI extends JFrame implements ActionListener {
 		setJMenuBar(menuBar);
 	}
 	
-	private void initBoard() {
-		board = new GameBoard(NUM_COLS, NUM_ROWS);
-		buttonGrid = new GridButton[NUM_ROWS][NUM_COLS];
+	private void initBoard() throws FileNotFoundException {
+		board = new GameBoard();
+		int rows = board.getHeight();
+		int cols = board.getWidth();
 		
-		setLayout(new GridLayout(NUM_ROWS, NUM_COLS));
-		for (int row = 0; row < NUM_ROWS; row++) {
-			for (int col = 0; col < NUM_COLS; col++) {
+		buttonGrid = new GridButton[rows][cols];
+		
+		getContentPane().removeAll();
+		getContentPane().revalidate();
+		
+		setLayout(new GridLayout(rows, cols));
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < cols; col++) {
 				GridButton cell = new GridButton(row, col);
 				cell.setPreferredSize(new Dimension(64, 64));
 				cell.addActionListener(this);
@@ -113,11 +125,11 @@ public class SimpleGUI extends JFrame implements ActionListener {
 		}
 		
 		// add some blocks for testing...
-		board.placeBlockAt(new HorizontalBlock(), 0, 0);
+		/*board.placeBlockAt(new HorizontalBlock(), 0, 0);
 		board.placeBlockAt(new HorizontalBlock(), 4, 4);
 		board.placeBlockAt(new VerticalBlock(), 1, 3);
 		board.placeBlockAt(new VerticalBlock(), 3, 1);
-		board.placeBlockAt(new TargetBlock(), 2, 2);
+		board.placeBlockAt(new TargetBlock(), 2, 2);*/
 		
 		updateUI();
 	}
@@ -125,8 +137,8 @@ public class SimpleGUI extends JFrame implements ActionListener {
 	// Update display based on the state of the board...
 	// TODO: make this more efficient
 	private void updateUI() {
-		for (int row = 0; row < NUM_ROWS; row++) {
-			for (int col = 0; col < NUM_COLS; col++) {
+		for (int row = 0; row < board.getHeight(); row++) {
+			for (int col = 0; col < board.getWidth(); col++) {
 				Block block = board.getBlockAt(row, col);
 				JButton cell = buttonGrid[row][col];
 				if (block == null)

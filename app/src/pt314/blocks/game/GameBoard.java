@@ -1,15 +1,57 @@
 package pt314.blocks.game;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.Scanner;
+
 public class GameBoard {
 
 	private int width;
 	private int height;
 	private Block[][] blocks;
 	
+	public int getWidth() {
+		return width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
 	public GameBoard(int width, int height) {
 		this.width = width;
 		this.height = height;
 		blocks = new Block[height][width];
+	}
+	
+	public GameBoard() throws FileNotFoundException{
+		Scanner scanner = new Scanner(new FileReader("res/puzzles/mypuzzle.txt"));
+		this.height = scanner.nextInt();
+		this.width = scanner.nextInt();
+		scanner.nextLine();
+		this.blocks = new Block[height][width];
+		
+		for (int i = 0; i < height; i++) {
+			String boardRow = scanner.nextLine();
+			System.out.println(i);
+			for (int j = 0; j < width; j++) {
+				char item = boardRow.charAt(j);
+				System.out.println(item);
+				if(item == 'H')
+					this.blocks[i][j] = new HorizontalBlock();
+				else if (item == 'V')
+					this.blocks[i][j] = new VerticalBlock();
+				else if(item == 'T')
+					this.blocks[i][j] = new TargetBlock();
+				
+				System.out.println("-------"+j);
+				System.out.println(this.blocks[2][4]);
+				System.out.println("lengths: " + this.blocks.length + " " + this.blocks[0].length);
+			}
+		}
+		
+		scanner.close();
 	}
 	
 	/**
@@ -20,6 +62,7 @@ public class GameBoard {
 	public void placeBlockAt(Block block, int row, int col) {
 		blocks[row][col] = block;
 	}
+	
 	
 	// TODO: Check for out of bounds
 	public Block getBlockAt(int row, int col) {
